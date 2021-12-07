@@ -1,9 +1,12 @@
 # YOLOv3 🚀 by Ultralytics, GPL-3.0 license
 
 # Start FROM Nvidia PyTorch image https://ngc.nvidia.com/catalog/containers/nvidia:pytorch
-FROM nvcr.io/nvidia/pytorch:21.10-py3
+#FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel
+FROM nvcr.io/nvidia/pytorch:21.11-py3
+#FROM dzw001/cuda11.1-cudnn8-python3.6-pytorch1.8.1-ubuntu18.04
 
 # Install linux packages
+RUN apt clean
 RUN apt update && apt install -y zip htop screen libgl1-mesa-glx
 
 # Install python dependencies
@@ -12,6 +15,18 @@ RUN python -m pip install --upgrade pip
 RUN pip uninstall -y nvidia-tensorboard nvidia-tensorboard-plugin-dlprof
 RUN pip install --no-cache -r requirements.txt coremltools onnx gsutil notebook wandb>=0.12.2
 RUN pip install --no-cache -U torch torchvision numpy Pillow
+RUN conda install numpy ninja pyyaml mkl mkl-include setuptools cmake cffi typing_extensions future six requests
+RUN conda install -c pytorch magma-cuda110
+
+WORKDIR /usr/src
+RUN git clone --recursive https://github.com/pytorch/pytorch
+WORKDIR /usr/src/pytorch
+RUN git submodule sync
+RUN git submodule update --init --recursive
+RUN export CMAKE_PREFIX_PATH=${CONDA_PREFIX:-"$(dirname $(which conda))/../"}
+RUN python setup.py install
+
+WORKDIR /usr/src
 # RUN pip install --no-cache torch==1.10.0+cu113 torchvision==0.11.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 
 # Create working directory
@@ -59,3 +74,4 @@ ADD https://ultralytics.com/assets/Arial.ttf /root/.config/Ultralytics/
 
 # DDP test
 # python -m torch.distributed.run --nproc_per_node 2 --master_port 1 train.py --epochs 3
+CMD ["bash"]
