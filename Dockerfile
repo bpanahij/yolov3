@@ -7,7 +7,8 @@ FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel
 
 # Install linux packages
 RUN apt clean
-RUN apt update && apt install -y zip htop screen libgl1-mesa-glx libglib2.0-0 vim 
+RUN apt update && apt install -y zip htop screen libgl1-mesa-glx
+RUN apt install -y libglib2.0-0 vim 
 # Install python dependencies
 COPY requirements.txt .
 RUN python -m pip install --upgrade pip
