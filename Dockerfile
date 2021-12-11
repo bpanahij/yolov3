@@ -38,6 +38,7 @@ WORKDIR /usr/src/app
 # Copy contents
 COPY . /usr/src/app
 
+ADD https://github.com/ultralytics/yolov5/releases/download/v4.0/yolov5s.pt /usr/src/app/
 # Downloads to user config dir
 ADD https://ultralytics.com/assets/Arial.ttf /root/.config/Ultralytics/
 
